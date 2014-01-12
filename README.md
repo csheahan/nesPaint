@@ -43,7 +43,7 @@ javac nesPaint.java
 java nesPaint
 ```
 
-###How to use###   
+###How to use###
 It is quite simple to use nesPaint, so long as you have a valid .chr file. At the beginning you are prompted to locate said .chr file. Once selected, the file is drawn, and you have 4 parts to the app. You have your canvas on the top left, which is what you will paint on. You have your paint (background sprites) on the top right which you use to paint on the canvas. You have a visual aid to tell you what is currently selected under your paint area. And finally you have an output to textfile button, which when pressed will output the current canvas into proper .db format to a file named output.txt in the current directory.
 
 ###Future Plans###
