@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.lang.StringBuilder;
 import java.io.IOException;
 import java.io.File;
+import java.util.Scanner;
 
 public class nesPaint extends JApplet {
 
@@ -26,8 +27,8 @@ public class nesPaint extends JApplet {
     window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     window.setVisible(true);
   }
-  
-  public static class SimplePaintPanel extends JPanel implements MouseListener, MouseMotionListener {  
+
+  public static class SimplePaintPanel extends JPanel implements MouseListener, MouseMotionListener {
     
     private int[][][] paintArr;  /* 16x16 array of 8x8 (64) pixels */
     private int[] currSelected;  /* Coordinates of the currently selected square */
@@ -230,6 +231,10 @@ public class nesPaint extends JApplet {
       /* Output Button */
       g.drawString("Output to textfile", 148, 278);
       g.drawRect(144, 266, 94, 14);
+
+      /* Load Button */
+      g.drawString("Load textfile", 248, 278);
+      g.drawRect(244, 266, 94, 14);
     }
 
     /**
@@ -284,6 +289,54 @@ public class nesPaint extends JApplet {
       }
     }
 
+    /**
+     * Outputs the current canvas state to a file named
+     *    "output.txt"
+     * in the directory of the program formatted for 
+     * immediate placement in an .asm file
+     */
+    public  void loadTextFile() {
+      String currDir = System.getProperty("user.dir");
+      JFileChooser fc = new JFileChooser();
+      fc.setCurrentDirectory(new File(currDir));
+      int returnVal = fc.showOpenDialog(this);
+
+      int x = 0;
+      int y = 0;
+
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File file = fc.getSelectedFile();
+        try {
+          Scanner readFile = new Scanner(file);
+          String line;
+          while(readFile.hasNextLine()) {
+            line = readFile.nextLine();
+            if(line.length() > 0) {
+              String values = line.split(" ")[3];
+              String[] valueList = values.split(",");
+              for(int i = 0; i < valueList.length; i++) {
+                int value = Integer.decode("0x" + valueList[i].substring(1));
+
+                currSelected[0] = value % 16;
+                currSelected[1] = value / 16;
+                paintCurrOnCanvas(x, y, getGraphics());
+
+                x++;
+                if(x == 32) {
+                  x = 0;
+                  y++;
+                }
+              }
+            }
+          }
+        }
+        catch (Exception e) {
+          System.out.println("---Exception found in method: loadTextFile");
+          e.printStackTrace();
+        }
+      }
+    }  
+
     public  String intToFormattedHex(int i) {
       String out = "";
       if (i <= 0xf) {
@@ -327,6 +380,13 @@ public class nesPaint extends JApplet {
       if (x >= 144 && x <= 238) {
         if (y >= 266 && y <= 280) {
           outputToTextFile();
+        }
+      }
+
+      /* Check if want to load data */
+      if (x >= 244 && x <= 338) {
+        if (y >= 266 && y <= 280) {
+          loadTextFile();
         }
       }
     }
